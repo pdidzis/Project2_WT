@@ -25,6 +25,9 @@
                     <li class="nav-item">
                         <a class="nav-link" href="/">Home</a>
                     </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/books">Books</a>
+                    </li>
                     @if(Auth::check())
                         <li class="nav-item">
                             <a class="nav-link" href="/authors">Authors</a>
