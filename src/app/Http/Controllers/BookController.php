@@ -6,10 +6,9 @@ use App\Models\Author;
 use App\Models\Book;
 use Illuminate\View\View;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
-use Illuminate\Routing\Controllers\HasMiddleware;
+use App\Http\Requests\BookRequest;
 
-class BookController extends Controller implements HasMiddleware
+class BookController extends Controller
 {
     // Call auth middleware
     public static function middleware(): array
@@ -47,40 +46,10 @@ class BookController extends Controller implements HasMiddleware
     }
 
     // Create new Book entry
-    public function put(Request $request): RedirectResponse
+    public function put(BookRequest $request): RedirectResponse
     {
-        $validatedData = $request->validate([
-            'name' => 'required|min:3|max:256',
-            'author_id' => 'required',
-            'description' => 'nullable',
-            'price' => 'nullable|numeric',
-            'year' => 'numeric',
-            'image' => 'nullable|image',
-            'display' => 'nullable',
-        ]);
-
         $book = new Book();
-        $book->name = $validatedData['name'];
-        $book->author_id = $validatedData['author_id'];
-        $book->description = $validatedData['description'];
-        $book->price = $validatedData['price'];
-        $book->year = $validatedData['year'];
-        $book->display = (bool) ($validatedData['display'] ?? false);
-
-        if ($request->hasFile('image')) {
-            // here you can add code that deletes old image file when new one is uploaded
-            $uploadedFile = $request->file('image');
-            $extension = $uploadedFile->clientExtension();
-            $name = uniqid();
-            $book->image = $uploadedFile->storePubliclyAs(
-                '/',
-                $name . '.' . $extension,
-                'uploads'
-            );
-        }
-
-        $book->save();
-
+        $this->saveBookData($book, $request);
         return redirect('/books');
     }
 
@@ -99,39 +68,9 @@ class BookController extends Controller implements HasMiddleware
     }
 
     // Update Book data
-    public function patch(Book $book, Request $request): RedirectResponse
+    public function patch(Book $book, BookRequest $request): RedirectResponse
     {
-        $validatedData = $request->validate([
-            'name' => 'required|min:3|max:256',
-            'author_id' => 'required',
-            'description' => 'nullable',
-            'price' => 'nullable|numeric',
-            'year' => 'numeric',
-            'image' => 'nullable|image',
-            'display' => 'nullable',
-        ]);
-
-        $book->name = $validatedData['name'];
-        $book->author_id = $validatedData['author_id'];
-        $book->description = $validatedData['description'];
-        $book->price = $validatedData['price'];
-        $book->year = $validatedData['year'];
-        $book->display = (bool) ($validatedData['display'] ?? false);
-
-        if ($request->hasFile('image')) {
-            // here you can add code that deletes old image file when new one is uploaded
-            $uploadedFile = $request->file('image');
-            $extension = $uploadedFile->clientExtension();
-            $name = uniqid();
-            $book->image = $uploadedFile->storePubliclyAs(
-                '/',
-                $name . '.' . $extension,
-                'uploads'
-            );
-        }
-
-        $book->save();
-
+        $this->saveBookData($book, $request);
         return redirect('/books/update/' . $book->id);
     }
 
@@ -145,5 +84,29 @@ class BookController extends Controller implements HasMiddleware
         $book->delete();
 
         return redirect('/books');
+    }
+
+    // Private method to validate and save Book data
+    private function saveBookData(Book $book, BookRequest $request): void
+    {
+        $validatedData = $request->validated();
+        $book->fill($validatedData);
+
+        // Ensure boolean conversion for 'display' field
+        $book->display = (bool) ($validatedData['display'] ?? false);
+
+        // Handle image upload
+        if ($request->hasFile('image')) {
+            $uploadedFile = $request->file('image');
+            $extension = $uploadedFile->clientExtension();
+            $name = uniqid();
+            $book->image = $uploadedFile->storePubliclyAs(
+                '/',
+                $name . '.' . $extension,
+                'uploads'
+            );
+        }
+
+        $book->save();
     }
 }
