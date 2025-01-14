@@ -1,7 +1,7 @@
 <?php
 
+use App\Http\Controllers\HomeController;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', function () {
-    return view('welcome');
-});
+// Define the route for the homepage
+Route::get('/', [HomeController::class, 'index']);
