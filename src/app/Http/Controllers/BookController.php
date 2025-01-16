@@ -90,6 +90,8 @@ class BookController extends Controller
     private function saveBookData(Book $book, BookRequest $request): void
     {
         $validatedData = $request->validated();
+
+        // Fill validated data into the book model
         $book->fill($validatedData);
 
         // Ensure boolean conversion for 'display' field

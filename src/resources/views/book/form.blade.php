@@ -49,6 +49,21 @@
             @enderror
         </div>
 
+        <!-- Genre -->
+        <div class="mb-3">
+            <label for="book-genre" class="form-label">Genre</label>
+            <input
+                type="text"
+                id="book-genre"
+                name="genre"
+                value="{{ old('genre', $book->genre) }}"
+                class="form-control @error('genre') is-invalid @enderror"
+            >
+            @error('genre')
+                <p class="invalid-feedback">{{ $errors->first('genre') }}</p>
+            @enderror
+        </div>
+
         <!-- Description -->
         <div class="mb-3">
             <label for="book-description" class="form-label">Description</label>

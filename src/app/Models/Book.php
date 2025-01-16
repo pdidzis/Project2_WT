@@ -5,8 +5,9 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use JsonSerializable;
 
-class Book extends Model
+class Book extends Model implements JsonSerializable
 {
     use HasFactory;
 
@@ -19,7 +20,8 @@ class Book extends Model
         'description',
         'price',
         'year',
-        'display', // Include 'display' if you plan to update this field via mass assignment
+        'genre', // Included 'genre'
+        'display',
     ];
 
     /**
@@ -29,5 +31,23 @@ class Book extends Model
     public function author(): BelongsTo
     {
         return $this->belongsTo(Author::class);
+    }
+
+    /**
+     * Serialize the JSON data for the main data object.
+     */
+    public function jsonSerialize(): mixed
+    {
+        return [
+            'id' => intval($this->id),
+            'name' => $this->name,
+            'description' => $this->description,
+            'author' => $this->author->name,
+            'genre' => $this->genre, // Added 'genre' field
+            'price' => number_format($this->price, 2),
+            'year' => intval($this->year),
+            'image' => $this->image ? asset('images/' . $this->image) : null,
+            'display' => (bool) $this->display,
+        ];
     }
 }

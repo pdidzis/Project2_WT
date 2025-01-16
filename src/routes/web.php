@@ -5,6 +5,8 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthorController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BookController;
+use App\Http\Controllers\GenreController;
+use App\Http\Controllers\DataController; // Added DataController
 
 // Define the route for the homepage
 Route::get('/', [HomeController::class, 'index']);
@@ -29,3 +31,8 @@ Route::post('/books/put', [BookController::class, 'put']);
 Route::get('/books/update/{book}', [BookController::class, 'update']);
 Route::post('/books/patch/{book}', [BookController::class, 'patch']);
 Route::post('/books/delete/{book}', [BookController::class, 'delete']);
+
+// Data/API routes
+Route::get('/data/get-top-books', [DataController::class, 'getTopBooks']);
+Route::get('/data/get-book/{book}', [DataController::class, 'getBook']);
+Route::get('/data/get-related-books/{book}', [DataController::class, 'getRelatedBooks']);
